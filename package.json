@@ -1,0 +1,30 @@
+{
+  "name": "lifehub-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tunggyvert/Lifehub-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tunggyvert/Lifehub-backend/issues"
+  },
+  "homepage": "https://github.com/tunggyvert/Lifehub-backend#readme",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jwt-token": "^1.0.9",
+    "mysql2": "^3.17.4",
+    "nodemailer": "^8.0.1"
+  }
+}
