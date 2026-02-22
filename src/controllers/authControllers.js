@@ -6,11 +6,11 @@ const { generateToken } = require('../utils/jwt');
 
 const Login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { username, password } = req.body;
 
         const [users] = await db.execute(
-            "SELECT id, email, username, password, role FROM users WHERE email = ?",
-            [email]
+            "SELECT id, email, username, password, role FROM users WHERE username = ?",
+            [username]
         );
 
         if (users.length === 0) {

@@ -30,7 +30,7 @@ const authentication = (req, res, next) => {
   }
 };
 
-export const authorize = (...allowedRoles) => {
+const authorize = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
