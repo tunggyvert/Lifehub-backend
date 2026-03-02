@@ -213,6 +213,63 @@ const getMe = async (req, res) => {
         res.status(500).json({ message: "Something went wrong" });
     }
 };
+const editProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    let { username, bio, profile_image } = req.body;
+
+    // แปลง undefined เป็น null
+    username = username ?? null;
+    bio = bio ?? null;
+    profile_image = profile_image ?? null;
+
+    if (username) {
+      const [existing] = await db.execute(
+        "SELECT id FROM users WHERE username = ? AND id != ?",
+        [username, userId]
+      );
+
+      if (existing.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Username already taken"
+        });
+      }
+    }
+
+    await db.execute(
+      `UPDATE users 
+       SET username = COALESCE(?, username),
+           bio = COALESCE(?, bio),
+           profile_image = COALESCE(?, profile_image)
+       WHERE id = ?`,
+      [username, bio, profile_image, userId]
+    );
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully"
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update profile"
+    });
+  }
+};
+const logout = async (req, res) => {
+    try {
+        // ฝั่ง client ต้องลบ token เอง
+        res.json({
+            success: true,
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Logout failed" });
+    }
+};
 
 
 module.exports = {
@@ -220,5 +277,7 @@ module.exports = {
     Register,
     forgetPassword,
     resetPassword,
-    getMe
+    getMe,
+    editProfile,
+    logout
 };

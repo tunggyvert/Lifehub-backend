@@ -9,5 +9,7 @@ router.post('/register', authControllers.Register);
 router.post('/forgot-password', authControllers.forgetPassword);
 router.post('/reset-password/:token', authControllers.resetPassword);
 router.get('/me', authentication, authControllers.getMe);
+router.put('/edit-profile', authentication, authControllers.editProfile);
+router.post('/logout', authentication, authControllers.logout);
 
 module.exports = router;
