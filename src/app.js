@@ -9,6 +9,7 @@ const authRoute = require("./routes/authRoutes");
 const postRoutes = require("./routes/postRoutes");
 const notificationRoutes = require("./routes/notiRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const PORT = process.env.PORT || 3000;
 
@@ -30,6 +31,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/auth", authRoute);
 app.use("/api/posts", postRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api", uploadRoutes);        
 app.use("/api/notifications", notificationRoutes);
 

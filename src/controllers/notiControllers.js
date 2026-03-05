@@ -5,12 +5,25 @@ const getMyNotifications = async (req, res) => {
     const userId = req.user.id;
     const { limit = 20, page = 1 } = req.query;
 
-    const offset = (page - 1) * limit;
+    const safeLimit = Math.max(1, Math.min(100, parseInt(limit, 10) || 20));
+    const safePage = Math.max(1, parseInt(page, 10) || 1);
+    const offset = (safePage - 1) * safeLimit;
+
+    console.log('[DEBUG] getMyNotifications', { 
+      userId, 
+      limit: req.query.limit, 
+      page: req.query.page, 
+      safeLimit, 
+      safePage, 
+      offset,
+      limitType: typeof safeLimit,
+      offsetType: typeof offset
+    });
 
     const notifications = await Notification.getUserNotifications(
       userId,
-      parseInt(limit),
-      parseInt(offset)
+      safeLimit,
+      offset
     );
 
     res.json({
@@ -19,6 +32,7 @@ const getMyNotifications = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('[ERROR] getMyNotifications:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

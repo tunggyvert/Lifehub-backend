@@ -15,6 +15,22 @@ const createNotification = async ({
 };
 
 const getUserNotifications = async (userId, limit = 20, offset = 0) => {
+  // Ensure we have valid integers
+  const safeLimit = Math.max(1, Math.min(100, Math.floor(Number(limit)) || 20));
+  const safeOffset = Math.max(0, Math.floor(Number(offset)) || 0);
+
+  console.log('[DEBUG] getUserNotifications', { 
+    userId, 
+    limit, 
+    offset, 
+    safeLimit, 
+    safeOffset,
+    limitType: typeof safeLimit,
+    offsetType: typeof safeOffset
+  });
+
+  // MySQL doesn't support placeholders for LIMIT/OFFSET in some versions
+  // Use string interpolation with validated numbers
   const [rows] = await db.execute(
     `SELECT 
         n.*, 
@@ -24,8 +40,8 @@ const getUserNotifications = async (userId, limit = 20, offset = 0) => {
      JOIN users u ON n.sender_id = u.id
      WHERE n.user_id = ?
      ORDER BY n.created_at DESC
-     LIMIT ? OFFSET ?`,
-    [userId, limit, offset]
+     LIMIT ${safeLimit} OFFSET ${safeOffset}`,
+    [userId]
   );
 
   return rows;
