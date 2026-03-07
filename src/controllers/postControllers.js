@@ -89,6 +89,30 @@ const getPosts = async (req, res) => {
   }
 };
 
+const getFollowingPosts = async (req, res) => {
+  try {
+    const currentUserId = req.user?.id;
+    if (!currentUserId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const posts = await Post.getFollowingPosts(currentUserId);
+
+    res.json({
+      success: true,
+      data: posts
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 const toggleLike = async (req, res) => {
   try {
     const postId = req.params.id;
@@ -228,13 +252,89 @@ const getPostsByUserId = async (req, res) => {
   }
 };
 
+const updatePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+    const { caption, image_url } = req.body;
+
+    if (!caption && caption !== '' && !image_url) {
+      return res.status(400).json({
+        success: false,
+        message: "Caption or image is required"
+      });
+    }
+
+    const updated = await Post.updatePost(postId, userId, caption, image_url);
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found or unauthorized"
+      });
+    }
+
+    // Fetch updated post to return
+    const updatedPost = await Post.getPostById(postId, userId);
+
+    const io = req.app.get("io");
+    io.emit("postUpdated", updatedPost);
+
+    res.json({
+      success: true,
+      message: "โพสต์ถูกแก้ไขแล้ว",
+      data: updatedPost
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const deletePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+    console.log(`[DEBUG] deletePost called with postId: ${postId}, userId: ${userId}`);
+
+    const deleted = await Post.deletePost(postId, userId);
+    console.log(`[DEBUG] deletePost result for ${postId}: ${deleted}`);
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found or unauthorized. PostId: " + postId + ", UserId: " + userId
+      });
+    }
+
+    const io = req.app.get("io");
+    if (io) io.emit("postDeleted", { postId });
+
+    res.json({
+      success: true,
+      message: "โพสต์ถูกลบแล้ว"
+    });
+  } catch (error) {
+    console.error('[ERROR] deletePost:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createPost,
   getPost,
   getPosts,
+  getFollowingPosts,
   toggleLike,
   addComment,
   getComments,
-  getPostsByUserId,  // ← เพิ่ม export
-  uploadImage  // ← เพิ่ม export
+  getPostsByUserId,
+  uploadImage,
+  updatePost,
+  deletePost
 };

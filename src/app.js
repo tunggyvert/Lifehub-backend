@@ -10,15 +10,16 @@ const postRoutes = require("./routes/postRoutes");
 const notificationRoutes = require("./routes/notiRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const userRoutes = require("./routes/userRoutes");
+const searchfilterRoutes = require("./routes/searchfilterRoutes");
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
-const server = http.createServer(app); 
+const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*", 
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -32,8 +33,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/auth", authRoute);
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api", uploadRoutes);        
+app.use("/api", uploadRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/search", searchfilterRoutes);
 
 
 io.on("connection", (socket) => {
